@@ -17,7 +17,7 @@ int assignRandom(){
 	
 	try {
 		int guess, answer = (rand() % 101) - 1;
-		cout << "To detdermine your heros luck you need to guess a number"
+		cout << "To determine your heros luck you need to guess a number"
 		<< " from 1 to 100" << endl;
 		cin >> guess;
 		cout << "Nice try, the number was " << answer << endl;
