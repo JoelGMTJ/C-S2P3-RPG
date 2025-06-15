@@ -26,6 +26,7 @@ public:
     Level(const Level&);
     Level(string);
     ~Level();
+    Character* getEnemy();
     bool hasWon();
     void addPrologue(string);
     void addEpilogue(string);
@@ -34,13 +35,13 @@ public:
     void execute();
 };
 
-//Default constructor, leaves basically all values empty
+//Default constructor, leaves all values empty
 Level::Level(){
     name = "Stage";
-    hero = 0; //PREGUNTAR COMO DEJAR VACIO A LEVEL
+    hero = 0;
     enemy = 0;
-    prologue = "Aqui va tu prologo";
-    epilogue = "Aqui va tu epilogo";
+    prologue = "Here goes your prologue";
+    epilogue = "Here goes your epilogue";
     won = true;
 }
 
@@ -57,10 +58,10 @@ Level::Level(const Level &a){
 //Creates a level with a custom name
 Level::Level(string nName){
     name = nName;
-    hero = 0; //PREGUNTAR COMO DEJAR VACIO A LEVEL
+    hero = 0; 
     enemy = 0;
-    prologue = "Aqui va tu prologo";
-    epilogue = "Aqui va tu epilogo";
+    prologue = "Here goes your prologue";
+    epilogue = "Here goes your epilogue";
     won = true;
 }
 
@@ -98,11 +99,17 @@ void Level::addEnemy(Character* nEnemy){
     enemy = nEnemy;
 }
 
+//Returns the enemy of the level
+Character* Level::getEnemy(){
+    return enemy;
+}
+
 //It makes the battle happen
 void Level::execute(){
     //Values used to make the battle system work
     bool continueBattle = true;
     Character* winner;
+    int nOfTurns=1;
 
     //Checks if the enemy is alive for the first time
     if (!hero->isAlive() &! enemy->isAlive()){
@@ -112,18 +119,42 @@ void Level::execute(){
     //Cycle so that the battle ends when somebody is dead
     while (continueBattle) {
 
-        hero->attack(enemy);
-        cout << hero->getName() << " attacks " << enemy->getName() << endl;
-        cout << enemy->getName() << " has " << enemy->getHealth() << endl;
-        enemy->attack(hero);//TO DO implementar algo para variar el orden de ataque
-        cout << enemy->getName() << " attacks " << hero->getName() << endl;
-        cout << hero->getName() << " has " << hero->getHealth() << endl;
-        cout << "End of the first turn" << endl << endl;
-        
+        if (*enemy < *hero){
+            hero->attack(enemy);
+            cout << hero->getName() << " attacks " << enemy->getName() << endl;
+            cout << enemy->getName() << " has " << enemy->getHealth() << endl;
+            if (!enemy->isAlive()){
+                break;
+            }
+            enemy->attack(hero);
+            cout << enemy->getName() << " attacks " << hero->getName() << endl;
+            cout << hero->getName() << " has " << hero->getHealth() << endl;
+        }
+        else {
+            enemy->attack(hero);
+            cout << enemy->getName() << " attacks " << hero->getName() << endl;
+            cout << hero->getName() << " has " << hero->getHealth() << endl;
+            if (!hero->isAlive()){
+                break;
+            }
+            hero->attack(enemy);
+            cout << hero->getName() << " attacks " << enemy->getName() << endl;
+            cout << enemy->getName() << " has " << enemy->getHealth() << endl;
+        }
         //Checks for when somebody dies
         if (!hero->isAlive() or !enemy->isAlive()){
             continueBattle = false;
         }
+        cout << "End of the turn " << nOfTurns << endl << endl;
+
+        //Conditional to see if the battle goes on for too long
+        if (nOfTurns>=30){
+            cout << "The hero got tired and was defeated by the " << enemy->getName()
+            << endl << endl;
+            continueBattle=false;
+            winner = enemy;
+        }
+        nOfTurns += 1;
     }
 
     //Conditional to check who won the battle
@@ -136,7 +167,7 @@ void Level::execute(){
         winner = enemy;
     }
 
-    cout << "La batalla ha terminado" << endl << "EL ganador es " 
+    cout << "The battle has ended" << endl << "The winner is " 
     << winner->getName() << endl << endl;
 
 }
